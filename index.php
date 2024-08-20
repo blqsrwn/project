@@ -43,11 +43,8 @@
         </form>
 
         <?php
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $voltage = $_POST['voltage'];
-            $current = $_POST['current'];
-            $rate = $_POST['rate'];
-
+        // Function to calculate electricity cost
+        function calculateElectricityCost($voltage, $current, $rate) {
             // Calculate Power (Wh)
             $power = $voltage * $current;
 
@@ -58,14 +55,31 @@
             $totalPerHour = $energyPerHour * ($rate / 100);
             $totalPerDay = $totalPerHour * 24;
 
+            // Return the results as an array
+            return [
+                'power' => $power,
+                'energyPerHour' => $energyPerHour,
+                'totalPerHour' => $totalPerHour,
+                'totalPerDay' => $totalPerDay
+            ];
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $voltage = $_POST['voltage'];
+            $current = $_POST['current'];
+            $rate = $_POST['rate'];
+
+            // Call the function to calculate costs
+            $result = calculateElectricityCost($voltage, $current, $rate);
+
             // Format the results to two decimal places
-            $totalPerHourFormatted = number_format($totalPerHour, 2);
-            $totalPerDayFormatted = number_format($totalPerDay, 2);
+            $totalPerHourFormatted = number_format($result['totalPerHour'], 2);
+            $totalPerDayFormatted = number_format($result['totalPerDay'], 2);
 
             echo "<div class='container mt-5'>
                     <h3>Results:</h3>
-                    <p>Power: {$power} Wh</p>
-                    <p>Energy per Hour: {$energyPerHour} kWh</p>
+                    <p>Power: {$result['power']} Wh</p>
+                    <p>Energy per Hour: {$result['energyPerHour']} kWh</p>
                     <p>Total Cost per Hour: RM {$totalPerHourFormatted}</p>
                     <p>Total Cost per Day: RM {$totalPerDayFormatted}</p>
                   </div>";
